@@ -1,32 +1,24 @@
-const nodemailer = require('nodemailer');
+// emailService.js
+const sgMail = require('@sendgrid/mail');
 require('dotenv').config();
 const jwt = require('jsonwebtoken');
 
+sgMail.setApiKey(process.env.SENDGRID_API_KEY);
+
 exports.generateResetPasswordToken = (email) => {
-    // Menghasilkan token reset password dengan menggunakan JWT
     const token = jwt.sign({ email }, process.env.JWT_SECRET, { expiresIn: '1h' });
     return token;
 };
 
-const transporter = nodemailer.createTransport({
-    service: 'Gmail',
-    auth: {
-        user: process.env.EMAIL_ADDRESS,
-        pass: process.env.EMAIL_PASSWORD
-    }
-});
-
-// Fungsi untuk mengirim email reset password
 exports.sendResetPasswordEmail = async (recipientEmail, resetLink) => {
     try {
-        // Kirim email menggunakan transporter
-        await transporter.sendMail({
-            from: process.env.EMAIL_ADDRESS,
+        const msg = {
             to: recipientEmail,
+            from: process.env.EMAIL_ADDRESS,
             subject: 'Reset Password',
-            html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`
-        });
-
+            html: `<p>Click <a href="${resetLink}">here</a> to reset your password.</p>`,
+        };
+        await sgMail.send(msg);
         console.log('Reset password email sent successfully.');
     } catch (error) {
         console.error('Error sending reset password email:', error);

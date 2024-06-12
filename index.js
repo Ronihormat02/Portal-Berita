@@ -1,5 +1,3 @@
-// index.js
-
 const express = require('express');
 const session = require('express-session');
 const bodyParser = require('body-parser');
@@ -7,7 +5,7 @@ const path = require('path');
 const flash = require('req-flash');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
-
+require('dotenv').config();
 const app = express();
 
 const PORT = process.env.PORT || 5050;
@@ -56,6 +54,7 @@ app.use('/register', registerRoutes);
 app.use('/', appRoutes);
 
 app.post('/forgot-password', forgotPasswordController.sendResetPasswordEmail);
+
 // Middleware untuk menangani kesalahan
 app.use((err, req, res, next) => {
     console.error(err.stack);

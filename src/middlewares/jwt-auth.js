@@ -1,8 +1,5 @@
-//jwt-auth.js
-
 const jwt = require('jsonwebtoken');
-const { jwtSecret } = require('../configs/jwtConfig'); // Pastikan path ini benar
-// jwt-auth.js
+const { jwtSecret } = require('../configs/jwtConfig');
 
 module.exports.verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
@@ -29,6 +26,10 @@ module.exports.verifyToken = (req, res, next) => {
 
         req.userId = decoded.userId;
         req.role = decoded.role;
+
+        // Menyimpan token dalam cookie dengan nama "token" dan opsi httpOnly
+        res.cookie('token', tokenWithoutBearer, { httpOnly: true });
+
         next();
     });
 };
