@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Add Comment</title>
+</head>
+<body>
+    <h1>Add Comment</h1>
+    <form id="commentForm">
+        <input type="text" name="id_news" placeholder="ID News">
+        <input type="text" name="id_user" placeholder="ID User">
+        <textarea name="comment" placeholder="Comment"></textarea>
+        <button type="submit">Post Comment</button>
+    </form>
+
+    <script>
+        document.getElementById('commentForm').addEventListener('submit', function(event) {
+            event.preventDefault(); // Hindari pengiriman formulir secara default
+
+            // Ambil nilai input dari formulir
+            const idNews = document.querySelector('input[name="id_news"]').value;
+            const idUser = document.querySelector('input[name="id_user"]').value;
+            const comment = document.querySelector('textarea[name="comment"]').value;
+
+            // Kirim permintaan POST ke endpoint /comments
+            fetch('http://localhost:5050/comments', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    id_news: idNews,
+                    id_user: idUser,
+                    comment: comment
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data); // Tampilkan respons dari server di konsol
+                // Di sini Anda bisa menangani respons sesuai kebutuhan
+            })
+            .catch(error => console.error('Error:', error));
+        });
+    </script>
+</body>
+</html>
