@@ -12,6 +12,7 @@ const newsController = require('../controllers/newsController');
 const favoriteController = require('../controllers/favoriteController');
 const commentController = require('../controllers/commentController');
 const categoryController = require('../controllers/categoryController');
+const { uploadFile } = require('../controllers/controller-upload');
 
 
 router.post('/auth/signup', authController.signup);
@@ -32,18 +33,20 @@ router.get('/news/category/:id_category', jwtAuth.verifyToken, newsController.ge
 
 
 router.get('/categories', categoryController.getAllCategories);
-router.post('/categories', categoryController.addCategory);
-router.put('/categories/:id', categoryController.updateCategory);  // Tambahkan ini untuk memperbarui kategori
-router.delete('/categories/:id', categoryController.deleteCategory);  // Tambahkan ini untuk menghapus kategori
+router.post('/categories',jwtAuth.verifyToken, categoryController.addCategory);
+router.put('/categories/:id', jwtAuth.verifyToken,categoryController.updateCategory);  // Tambahkan ini untuk memperbarui kategori
+router.delete('/categories/:id', jwtAuth.verifyToken,categoryController.deleteCategory);  // Tambahkan ini untuk menghapus kategori
 
 router.post('/news/favorite', jwtAuth.verifyToken, favoriteController.addFavorite);
 router.delete('/news/favorite/:newsId', jwtAuth.verifyToken, favoriteController.removeFavorite);
 router.get('/favorites', favoriteController.getAllfavorites);
-router.put('/favorites/:favoriteId', favoriteController.updateFavorite);
+router.put('/favorites/:favoriteId', jwtAuth.verifyToken, favoriteController.updateFavorite);
 
+router.get('/comments/:newsId', commentController.getCommentsByNewsId);
 router.post('/comments/add', jwtAuth.verifyToken, commentController.addComment); 
-router.get('/news/:id/comments', jwtAuth.verifyToken, commentController.getCommentsByNewsId); 
 router.delete('/comments/:id', jwtAuth.verifyToken, commentController.deleteComment); 
+
+router.post('/upload', jwtAuth.verifyToken, uploadFile);
 
 
 module.exports = router;

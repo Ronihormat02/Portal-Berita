@@ -5,6 +5,7 @@ const path = require('path');
 const flash = require('req-flash');
 const cors = require('cors');
 const bcrypt = require('bcrypt');
+const fileUpload = require('express-fileupload'); // Pastikan ini ditambahkan
 require('dotenv').config();
 const app = express();
 
@@ -45,6 +46,8 @@ app.use(function(req, res, next) {
 // Set view engine dan direktori views
 app.set('views', path.join(__dirname, 'src/views'));
 app.set('view engine', 'ejs');
+
+app.use(fileUpload()); // Pastikan ini ditambahkan
 
 // Rute login dan register tanpa middleware verifyToken
 app.use('/login', loginRoutes);

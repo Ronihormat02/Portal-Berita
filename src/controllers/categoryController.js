@@ -21,6 +21,7 @@ exports.getAllCategories = async (req, res) => {
     }
 };
 
+
 exports.addCategory = async (req, res) => {
     const { name } = req.body;
 
@@ -66,18 +67,19 @@ exports.updateCategory = async (req, res) => {
     }
 };
 
-
 exports.deleteCategory = async (req, res) => {
-    try {
-        const { categoryId } = req.params; // Mendapatkan id kategori dari parameter URL
-        const sql = 'DELETE FROM tbl_category WHERE id_category = ?'; // Query untuk menghapus kategori berdasarkan id
+    const { id } = req.params;
 
-        // Menjalankan query DELETE dan menangani hasilnya
-        await runQuery(sql, [categoryId]);
+    try {
+        const existingCategory = await runQuery('SELECT * FROM tbl_category WHERE id_category = ?', [id]);
+        if (existingCategory.length === 0) {
+            return res.status(404).json({ message: 'Category not found' });
+        }
+
+        await runQuery('DELETE FROM tbl_category WHERE id_category = ?', [id]);
         res.json({ message: 'Category deleted successfully' });
     } catch (error) {
         console.error('Error deleting category:', error.message);
         res.status(500).json({ message: 'Error deleting category' });
     }
 };
-

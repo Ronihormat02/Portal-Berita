@@ -54,39 +54,42 @@ exports.removeFavorite = async (req, res) => {
         const { newsId } = req.params;
         const userId = req.userId; // Pastikan userId telah diperoleh dari token JWT
 
-        const rowsAffected = await Favorite.removeFavorite(userId, newsId);
-        if (rowsAffected > 0) {
-            res.json({ message: 'News removed from favorites' });
-        } else {
-            res.status(404).json({ message: 'News not found in favorites' });
-        }
+        await Favorite.removeFavorite(userId, newsId);
+        res.json({ message: 'Berita berhasil dihapus dari favorit' });
     } catch (error) {
-        console.error('Error removing news from favorites:', error.message);
-        res.status(500).json({ message: 'Error removing news from favorites' });
+        console.error('Kesalahan saat menghapus berita dari favorit:', error.message);
+        res.status(500).json({ message: 'Kesalahan saat menghapus berita dari favorit' });
     }
 };
 
 exports.updateFavorite = async (req, res) => {
     try {
-        const { favoriteId } = req.params;
-        const { userId, newsId } = req.body; // Update yang ingin dilakukan
-
-        // Pastikan request body memiliki properti userId dan newsId
-        if (!userId || !newsId) {
-            return res.status(400).json({ message: 'User ID and News ID are required for update' });
-        }
-
-        // Lakukan update favorit dengan userId dan newsId yang sesuai
-        const rowsAffected = await Favorite.updateFavorite(favoriteId, userId, newsId);
-        
-        // Periksa apakah ada baris yang terpengaruh
-        if (rowsAffected > 0) {
-            res.json({ message: 'Favorite updated successfully' });
-        } else {
-            res.status(404).json({ message: 'Favorite not found or no changes made' });
-        }
+      const { favoriteId } = req.params;
+      const { newsId } = req.body;
+      const userId = req.userId;
+  
+      console.log(`Updating favorite with id ${favoriteId} and newsId ${newsId} for user ${userId}`);
+  
+      // Pastikan request body memiliki properti newsId
+      if (!newsId) {
+        return res.status(400).json({ message: 'Tidak ada data yang diperbarui' });
+      }
+  
+      // Lakukan update favorit menggunakan kueri SQL langsung
+      const updateQuery = 'UPDATE tbl_favorite SET id_news = ? WHERE id_favorite = ? AND id_user = ?';
+      const result = await db.query(updateQuery, [newsId, favoriteId, userId]);
+  
+      console.log(`Update result: ${result}`);
+  
+      // Check if the query was successful
+      if (result && result.affectedRows > 0) {
+        res.json({ message: 'Favorit diperbarui dengan sukses' });
+      } else {
+        console.error(`Error updating favorite: affectedRows is 0`);
+        res.status(404).json({ message: 'Favorit tidak ditemukan atau tidak ada perubahan yang dilakukan' });
+      }
     } catch (error) {
-        console.error('Error updating favorite:', error.message);
-        res.status(500).json({ message: 'Error updating favorite' });
+      console.error(`Error updating favorite: ${error.message}`);
+      res.status(500).json({ message: 'Kesalahan dalam memperbarui favorit' });
     }
-};
+  };
