@@ -1,6 +1,9 @@
 const path = require('path');
 const fs = require('fs');
-const jwtAuth = require('../middlewares/jwt-auth'); // Sesuaikan path dengan struktur proyek Anda
+const jwtAuth = require('../middlewares/jwt-auth');
+require('dotenv').config(); // Load environment variables
+
+const baseUrl = process.env.BASE_URL; // Get base URL from environment variables
 
 // Fungsi untuk menangani upload file
 exports.uploadFile = (req, res) => {
@@ -22,8 +25,8 @@ exports.uploadFile = (req, res) => {
         // Ambil file yang diunggah
         const file = req.files.file;
 
-        // Tentukan lokasi untuk menyimpan file (misalnya: 'uploads' di dalam direktori proyek)
-        const uploadDir = path.join(process.cwd(), 'uploads'); // Gunakan process.cwd() untuk mendapatkan direktori kerja saat ini
+        // Tentukan lokasi untuk menyimpan file
+        const uploadDir = path.join(process.cwd(), 'uploads');
         if (!fs.existsSync(uploadDir)) {
             fs.mkdirSync(uploadDir); // Buat direktori jika tidak ada
         }
@@ -39,7 +42,7 @@ exports.uploadFile = (req, res) => {
 
             // Konstruksi URL file yang diunggah
             const fileName = file.name.split('.').slice(0, -1).join('.'); // Menghapus ekstensi file
-            const fileUrl = `http://localhost:5050/images/${fileName}.jpg`; // Sesuaikan dengan URL server Anda
+            const fileUrl = `${baseUrl}/images/${fileName}.jpg`; // Gunakan base URL dari variabel lingkungan
 
             res.send(`File berhasil diunggah! URL: ${fileUrl}`);
         });
@@ -65,25 +68,25 @@ exports.uploadFile = (req, res) => {
         
                 // Konstruksi URL file yang diunggah
                 const fileName = file.name.split('.').slice(0, -1).join('.'); // Menghapus ekstensi file
-                const fileUrl = `http://localhost:5050/images/${fileName}.jpg`; // Sesuaikan dengan URL server Anda
+                const fileUrl = `${baseUrl}/images/${fileName}.jpg`; // Gunakan base URL dari variabel lingkungan
         
                 res.send(`File berhasil diperbarui! URL: ${fileUrl}`);
             });
         });
     } else if (req.method === 'DELETE') {
         jwtAuth.verifyToken(req, res, () => {
-          const fileName = req.params.fileName;
-        
-          // Tentukan path lengkap file yang akan dihapus
-          const filePath = path.join(uploadDir, fileName);
-      
-          // Hapus file menggunakan fs.unlink
-          fs.unlink(filePath, (err) => {
-              if (err) {
-                  return res.status(500).send(err);
-              }
-      
-              res.send('File berhasil dihapus');
+            const fileName = req.params.fileName;
+
+            // Tentukan path lengkap file yang akan dihapus
+            const filePath = path.join(process.cwd(), 'uploads', fileName);
+
+            // Hapus file menggunakan fs.unlink
+            fs.unlink(filePath, (err) => {
+                if (err) {
+                    return res.status(500).send(err);
+                }
+
+                res.send('File berhasil dihapus');
             });
         });
     }
