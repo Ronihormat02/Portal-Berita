@@ -1,56 +1,68 @@
-// forgotPasswordController.js
+// //forgoPasswordControllwwer.js
 
-const bcrypt = require('bcrypt');
-const jwt = require('jsonwebtoken');
-const { sendResetPasswordEmail, generateResetPasswordToken } = require('../services/emailService');
+// const express = require('express');
+// const router = express.Router();
+// const bcrypt = require('bcrypt');
+// const jwt = require('jsonwebtoken');
+// const nodemailer = require('nodemailer'); // Modul untuk pengiriman email
 
-exports.sendResetPasswordEmail = async (req, res) => {
-    try {
-        const { email } = req.body;
+// const db = require('../configs/database');
 
-        // Generate token reset password
-        const resetToken = generateResetPasswordToken(email);
+// // Function untuk menjalankan query
+// async function runQuery(sql, args) {
+//     return new Promise((resolve, reject) => {
+//         db.query(sql, args, (err, results) => {
+//             if (err) return reject(err);
+//             resolve(results);
+//         });
+//     });
+// }
 
-        // Buat tautan reset password
-        const resetLink = `http://localhost:5050/reset-password?token=${resetToken}`;
+// // Endpoint untuk mengirim email reset password
+// router.post('/forgot-password', async (req, res) => {
+//     try {
+//         const { email } = req.body;
 
-        // Kirim email reset password
-        await sendResetPasswordEmail(email, resetLink);
+//         // Cari pengguna berdasarkan email
+//         const userResult = await runQuery('SELECT * FROM tbl_users WHERE email = ?', [email]);
+//         const user = userResult[0];
 
-        return res.status(200).json({ message: 'Reset password email sent successfully.' });
-    } catch (error) {
-        console.error('Error sending reset password email:', error);
-        return res.status(500).json({ message: 'Internal server error.' });
-    }
-};
+//         if (!user) {
+//             return res.status(404).json({ message: 'Email tidak terdaftar' });
+//         }
 
-exports.resetPassword = async (req, res) => {
-    try {
-        const { email, token, newPassword } = req.body;
+//         // Generate token untuk reset password
+//         const token = jwt.sign({ userId: user.id_user }, process.env.JWT_SECRET, { expiresIn: '1h' });
 
-        jwt.verify(token, process.env.JWT_SECRET, async (err, decoded) => {
-            if (err) {
-                console.error('Error verifikasi token:', err);
-                return res.status(401).json({ message: 'Invalid token' });
-            }
+//         // Kirim email reset password
+//         const transporter = nodemailer.createTransport({
+//             service: 'gmail',
+//             auth: {
+//                 user: process.env.EMAIL_USER,
+//                 pass: process.env.EMAIL_PASS,
+//             },
+//         });
 
-            const hashedPassword = await bcrypt.hash(newPassword, 10);
-           
+//         const mailOptions = {
+//             from: process.env.EMAIL_USER,
+//             to: user.email,
+//             subject: 'Reset Password',
+//             html: `<p>Klik <a href="${process.env.BASE_URL}/reset-password/${token}">tautan ini</a> untuk mereset password Anda.</p>`,
+//         };
 
-            return res.status(200).json({ message: 'Password reset successfully.' });
-        });
-    } catch (error) {
-        console.error('Error resetting password:', error);
-        return res.status(500).json({ message: 'Internal server error.' });
-    }
-};
+//         transporter.sendMail(mailOptions, (error, info) => {
+//             if (error) {
+//                 console.error('Gagal mengirim email reset password:', error);
+//                 return res.status(500).json({ message: 'Gagal mengirim email reset password' });
+//             }
+//             console.log('Email reset password berhasil dikirim:', info.response);
+//             res.json({ message: 'Email reset password berhasil dikirim' });
+//         });
+//     } catch (error) {
+//         console.error('Kesalahan saat memproses permintaan reset password:', error.message);
+//         res.status(500).json({ message: 'Kesalahan saat memproses permintaan reset password' });
+//     }
+// });
 
-const determineRole = (email) => {
-    if (email.endsWith('@admin.com')) {
-        return 'admin';
-    } else if (email.endsWith('@superadmin.com')) {
-        return 'superadmin';
-    } else {
-        return 'user';
-    }
-};
+// module.exports = router;
+

@@ -56,7 +56,7 @@ app.use('/register', registerRoutes);
 // Rute lainnya dengan middleware verifyToken jika diperlukan di dalam router
 app.use('/', appRoutes);
 
-app.post('/forgot-password', forgotPasswordController.sendResetPasswordEmail);
+//app.post('/forgot-password', forgotPasswordController.sendResetPasswordEmail);
 
 // Middleware untuk menangani kesalahan
 app.use((err, req, res, next) => {

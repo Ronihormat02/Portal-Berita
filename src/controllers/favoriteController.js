@@ -10,11 +10,11 @@ async function runQuery(sql, args) {
     });
 }
 
-exports.getAllfavorites = [
+exports.getAllFavorites = [
     jwtAuth.verifyToken,
     async (req, res) => {
         try {
-            const userId = req.userId;
+            const userId = req.userId; // Ambil userId dari token JWT yang diverifikasi
             const favorites = await runQuery('SELECT * FROM tbl_favorite WHERE id_user = ?', [userId]);
             res.json(favorites);
         } catch (error) {
@@ -36,7 +36,7 @@ exports.addFavorite = [
             }
 
             const insertQuery = 'INSERT INTO tbl_favorite (id_user, id_news) VALUES (?, ?)';
-            const result = await db.query(insertQuery, [userId, newsId]);
+            const result = await runQuery(insertQuery, [userId, newsId]);
 
             if (result.insertId) {
                 res.status(201).json({ message: 'Berita Favorit Ditambahkan', favoriteId: result.insertId });
@@ -58,7 +58,7 @@ exports.removeFavorite = [
             const { newsId } = req.params;
 
             const deleteQuery = 'DELETE FROM tbl_favorite WHERE id_user = ? AND id_news = ?';
-            await db.query(deleteQuery, [userId, newsId]);
+            await runQuery(deleteQuery, [userId, newsId]);
 
             res.json({ message: 'Berita berhasil dihapus dari favorit' });
         } catch (error) {
@@ -81,7 +81,7 @@ exports.updateFavorite = [
             }
 
             const updateQuery = 'UPDATE tbl_favorite SET id_news = ? WHERE id_favorite = ? AND id_user = ?';
-            const result = await db.query(updateQuery, [newsId, favoriteId, userId]);
+            const result = await runQuery(updateQuery, [newsId, favoriteId, userId]);
 
             if (result && result.affectedRows > 0) {
                 res.json({ message: 'Favorite updated successfully' });
