@@ -37,10 +37,10 @@ router.post('/categories',jwtAuth.verifyToken, categoryController.addCategory);
 router.put('/categories/:id', jwtAuth.verifyToken,categoryController.updateCategory);  // Tambahkan ini untuk memperbarui kategori
 router.delete('/categories/:id', jwtAuth.verifyToken,categoryController.deleteCategory);  // Tambahkan ini untuk menghapus kategori
 
+router.put('/favorites/:favoriteId', jwtAuth.verifyToken, favoriteController.updateFavorite);
 router.post('/news/favorite', jwtAuth.verifyToken, favoriteController.addFavorite);
 router.delete('/news/favorite/:newsId', jwtAuth.verifyToken, favoriteController.removeFavorite);
-router.get('/favorites', favoriteController.getAllfavorites);
-router.put('/favorites/:favoriteId', jwtAuth.verifyToken, favoriteController.updateFavorite);
+router.get('/favorites',jwtAuth.verifyToken, favoriteController.updateFavorite);
 
 router.get('/comments/:newsId', commentController.getCommentsByNewsId);
 router.post('/comments/add', jwtAuth.verifyToken, commentController.addComment); 

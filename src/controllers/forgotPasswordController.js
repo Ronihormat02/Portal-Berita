@@ -35,8 +35,7 @@ exports.resetPassword = async (req, res) => {
             }
 
             const hashedPassword = await bcrypt.hash(newPassword, 10);
-            // Update password di database sesuai email yang didapatkan dari token
-            // Contoh: await User.updateOne({ email: decoded.email }, { password: hashedPassword });
+           
 
             return res.status(200).json({ message: 'Password reset successfully.' });
         });

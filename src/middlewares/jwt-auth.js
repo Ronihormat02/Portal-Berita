@@ -7,8 +7,6 @@ const { jwtSecret } = require('../configs/jwtConfig');
 const verifyToken = (req, res, next) => {
     const token = req.headers['authorization'];
 
-    console.log('Token yang diterima:', token);
-
     if (!token) {
         return res.status(403).json({ message: 'No token provided' });
     }
@@ -21,11 +19,12 @@ const verifyToken = (req, res, next) => {
 
     jwt.verify(tokenWithoutBearer, jwtSecret, (err, decoded) => {
         if (err) {
-            console.error('Error verifikasi token:', err);
+            console.error('Error verifying token:', err); // Log kesalahan verifikasi token
             return res.status(401).json({ message: 'Invalid token' });
         }
 
-        console.log('Decoded JWT:', decoded);
+        // Pada lingkungan produksi, hindari mencetak decoded JWT seperti berikut
+        // console.log('Decoded JWT:', decoded);
 
         req.userId = decoded.userId;
         req.role = decoded.role;
@@ -41,11 +40,18 @@ const verifyToken = (req, res, next) => {
 exports.uploadFile = (req, res) => {
     // Pastikan ada file yang diunggah
     if (!req.files || Object.keys(req.files).length === 0) {
-        return res.status(400).send('Tidak ada file yang diunggah.');
+        return res.status(400).send('No files were uploaded.');
     }
 
     // Ambil file yang diunggah
     const file = req.files.file;
+
+    // Pastikan ekstensi file yang diperbolehkan, misalnya hanya gambar
+    const allowedExtensions = ['.jpg', '.jpeg', '.png'];
+    const fileExt = path.extname(file.name).toLowerCase();
+    if (!allowedExtensions.includes(fileExt)) {
+        return res.status(400).send('Only JPG, JPEG, and PNG files are allowed.');
+    }
 
     // Tentukan lokasi untuk menyimpan file (misalnya: 'uploads' di dalam direktori proyek)
     const uploadDir = path.join(__dirname, '..', 'uploads');
@@ -58,6 +64,7 @@ exports.uploadFile = (req, res) => {
     // Simpan file ke server
     file.mv(uploadPath, (err) => {
         if (err) {
+            console.error('Error saving file:', err); // Log kesalahan penyimpanan file
             return res.status(500).send(err);
         }
 
@@ -65,7 +72,7 @@ exports.uploadFile = (req, res) => {
         const fileName = file.name.split('.').slice(0, -1).join('.'); // Menghapus ekstensi file
         const fileUrl = `http://localhost:3000/images/${fileName}.jpg`; // Sesuaikan dengan URL server Anda
 
-        res.send(`File berhasil diunggah! URL: ${fileUrl}`);
+        res.send(`File successfully uploaded! URL: ${fileUrl}`);
     });
 };
 
