@@ -23,6 +23,20 @@ exports.getAllNews = async (req, res) => {
         res.status(500).json({ message: 'Error fetching news' });
     }
 };
+exports.getNewsById = async (req, res) => {
+    const { id } = req.params;
+    try {
+        const news = await runQuery('SELECT * FROM tbl_news WHERE id_news = ?', [id]);
+        if (news.length === 0) {
+            return res.status(404).json({ message: 'News not found' });
+        }
+        res.json(news[0]);
+    } catch (error) {
+        console.error('Error fetching news by ID:', error.message);
+        res.status(500).json({ message: 'Error fetching news by ID' });
+    }
+};
+
 
 // Fungsi untuk menambahkan berita baru
 
@@ -48,17 +62,14 @@ exports.addNews = async (req, res) => {
 
 
 // Fungsi untuk mendapatkan berita berdasarkan ID
-exports.getNewsById = async (req, res) => {
-    const { id } = req.params;
+exports.getNewsByCategory = async (req, res) => {
+    const { id_category } = req.params;
     try {
-        const news = await runQuery('SELECT * FROM tbl_news WHERE id_news = ?', [id]);
-        if (news.length === 0) {
-            return res.status(404).json({ message: 'News not found' });
-        }
-        res.json(news[0]);
+        const news = await runQuery('SELECT * FROM tbl_news WHERE id_category = ?', [id_category]);
+        res.json(news);
     } catch (error) {
-        console.error('Error fetching news by ID:', error.message);
-        res.status(500).json({ message: 'Error fetching news by ID' });
+        console.error('Error fetching news by category:', error.message);
+        res.status(500).json({ message: 'Error fetching news by category' });
     }
 };
 

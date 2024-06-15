@@ -49,7 +49,6 @@ exports.addFavorite = [
         }
     }
 ];
-
 exports.removeFavorite = [
     jwtAuth.verifyToken,
     async (req, res) => {
@@ -57,10 +56,21 @@ exports.removeFavorite = [
             const userId = req.userId;
             const { newsId } = req.params;
 
-            const deleteQuery = 'DELETE FROM tbl_favorite WHERE id_user = ? AND id_news = ?';
-            await runQuery(deleteQuery, [userId, newsId]);
+            // Log untuk memverifikasi parameter
+            console.log(`Attempting to delete favorite with userId: ${userId} and newsId: ${newsId}`);
 
-            res.json({ message: 'Berita berhasil dihapus dari favorit' });
+            const deleteQuery = 'DELETE FROM tbl_favorite WHERE id_user = ? AND id_news = ?';
+            const result = await runQuery(deleteQuery, [userId, newsId]);
+
+            // Log untuk memeriksa hasil query
+            console.log(`Delete query result:`, result);
+
+            if (result && result.affectedRows > 0) {
+                res.json({ message: 'Berita berhasil dihapus dari favorit' });
+            } else {
+                console.error('Error: No rows affected');
+                res.status(404).json({ message: 'Favorite not found or already deleted' });
+            }
         } catch (error) {
             console.error('Kesalahan saat menghapus berita dari favorit:', error.message);
             res.status(500).json({ message: 'Kesalahan saat menghapus berita dari favorit' });
