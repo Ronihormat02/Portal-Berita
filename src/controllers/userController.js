@@ -43,23 +43,20 @@ exports.getAllUsers = async (req, res) => {
 
 exports.getUser = async (req, res) => {
   try {
-    // Verifikasi token sebelum melanjutkan
-    jwtAuth.verifyToken(req, res, async () => {
-      const userId = req.params.userId;
+    const userId = req.params.userId;
 
-      // Dapatkan pengguna berdasarkan ID dari database
-      const user = await runQuery('SELECT * FROM tbl_users WHERE id_user = ?', [userId]);
+    // Query to fetch the user based on the provided ID
+    const user = await runQuery('SELECT * FROM tbl_users WHERE id_user = ?', [userId]);
 
-      if (user.length === 0) {
-        return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
-      }
+    if (user.length === 0) {
+      return res.status(404).json({ message: 'Pengguna tidak ditemukan' });
+    }
 
-      res.json(user[0]);
-    });
+    res.json(user[0]);
   } catch (error) {
     console.error(error);
-    res.status(500).json({ message: 'Internal server error' });
-  }
+    res.status(500).json({ message: 'Internal server error' });
+  }
 };
 
 exports.updateUser = async (req, res) => {

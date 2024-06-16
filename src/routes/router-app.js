@@ -18,7 +18,7 @@ router.post('/auth/signup', authController.signup);
 router.post('/auth/signin', authController.signin);
 
 router.get('/users', jwtAuth.verifyToken, userController.getAllUsers);
-router.get('/users/:userId', jwtAuth.verifyToken, userController.getUser);
+router.get('/users/:userId', userController.getUser);
 router.put('/users/:userId', jwtAuth.verifyToken, userController.updateUser);
 router.delete('/users/:userId', jwtAuth.verifyToken, userController.deleteUser);
 
